@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Management Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .filter-container {
+            margin-bottom: 20px;
+        }
+        select {
+            margin-right: 10px;
+            padding: 5px;
+        }
+        .chart {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Управление Рисками</h1>
+    <div class="filter-container">
+        <label for="asset-filter">Выберите актив:</label>
+        <select id="asset-filter">
+            <option value="all">Все</option>
+            <option value="Asset1">Актив 1</option>
+            <option value="Asset2">Актив 2</option>
+        </select>
+
+        <label for="period-filter">Выберите период:</label>
+        <select id="period-filter">
+            <option value="all">Все</option>
+            <option value="Q1">Q1</option>
+            <option value="Q2">Q2</option>
+        </select>
+    </div>
+
+    <div class="chart" id="risk-chart"></div>
+
+    <script>
+        const riskData = [
+            { id: "R001", description: "Утечка нефти", category: "Environmental", owner: "Ivan Petrov", likelihood: "High", impact: "High", score: 9, status: "Open", asset: "Asset1", period: "Q1" },
+            { id: "R002", description: "Повышение цен на сырьё", category: "Financial", owner: "Maria Sidorova", likelihood: "Medium", impact: "High", score: 6, status: "Open", asset: "Asset2", period: "Q1" },
+            { id: "R003", description: "Технические сбои оборудования", category: "Operational", owner: "Alexej Ivanov", likelihood: "Low", impact: "Medium", score: 4, status: "Closed", asset: "Asset1", period: "Q2" },
+            // Добавьте больше данных по необходимости
+        ];
+
+        function filterData(asset, period) {
+            return riskData.filter(item => {
+                const assetMatch = asset === "all" || item.asset === asset;
+                const periodMatch = period === "all" || item.period === period;
+                return assetMatch && periodMatch;
+            });
+        }
+
+        function updateChart() {
+            const asset = document.getElementById('asset-filter').value;
+            const period = document.getElementById('period-filter').value;
+
+            const filteredData = filterData(asset, period);
+            const riskScores = filteredData.map(item => item.score || 0);
+            const descriptions = filteredData.map(item => item.description || "Без описания");
+
+            const trace = {
+                x: descriptions,
+                y: riskScores,
+                type: 'bar'
+            };
+
+            const layout = {
+                title: 'Рисковые Оценки',
+                xaxis: { title: 'Описание Риска' },
+                yaxis: { title: 'Оценка Риска' }
+            };
+
+            Plotly.newPlot('risk-chart', [trace], layout);
+        }
+
+        document.getElementById('asset-filter').addEventListener('change', updateChart);
+        document.getElementById('period-filter').addEventListener('change', updateChart);
+
+        // Первоначальное построение графика
+        updateChart();
+    </script>
+</body>
+</html>
